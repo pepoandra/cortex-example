@@ -48,6 +48,6 @@ class PythonPredictor:
                 'score': raw_predictions.score[x],
                 'liked': raw_predictions.liked[x]
             }
-            result['predictions'].push(item)
+            result['predictions'].append(item)
         return result
 
