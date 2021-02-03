@@ -1,10 +1,6 @@
 import os
 import pickle
 import sys
-from app.entities.model.prediction import Prediction
-from app.library.model_repository.loader.driver.filesystem import Filesystem
-from app.library.model_repository.repository import Repository
-from app.entities.model.model_info import ModelInfo
 import pandas as pd
 
 
@@ -13,14 +9,6 @@ class PythonPredictor:
         dirname = os.path.dirname(__file__)
         filename = os.path.join(dirname, 'model.pkl')
         self.model = pickle.load(open(filename, "rb"))
-        
-        model_info = ModelInfo(
-            "BRAND_GENDER",
-            "CBCF",
-            "1.0",
-            "2021-01-25-00-17-18"
-        )
-        #åself.model = loader.load_model(model_info)
 
     def predict(self, payload):
         
