@@ -18,28 +18,29 @@ class PythonPredictor:
                                  decode_responses=True)
     
     def predict(self, payload):
+        response = {
+                'usecase': self.model.to_model_info().usecase,
+                'model': self.model.to_model_info().model,
+                'version': self.model.to_model_info().version,
+                'timestamp': self.model.to_model_info().timestamp,
+                'predictions': []
+            }
         member_id = payload['memberId']
         user_data_json = self.redis.get(f'scores:u:{member_id}')
         if user_data_json is not None:
             user_data = pd.read_json(user_data_json)
             raw_predictions = self.model.predict(user_data)
         
-        if raw_predictions is None or len(raw_predictions.brand.keys()) < 1:
-            return {
-                'usecase': self.model.to_model_info().usecase,
-                'model': self.model.to_model_info().model,
-                'version': self.model.to_model_info().version,
-                'timestamp': self.model.to_model_info().timestamp,
-            }
-        result = {
-            'predictions': []
-        }
-        for x in range(len(raw_predictions.brand.keys())):
-            item = {
-                'brand_id': raw_predictions.brand[x],
-                'gender': raw_predictions.gender[x],
-                'score': raw_predictions.score[x],
-                'liked': raw_predictions.liked[x]
-            }
-            result['predictions'].append(item)
-        return result
+            if raw_predictions is None or len(raw_predictions.brand.keys()) < 1:
+                return response
+    
+            for x in range(len(raw_predictions.brand.keys())):
+                item = {
+                    'brand_id': raw_predictions.brand[x],
+                    'gender': raw_predictions.gender[x],
+                    'score': raw_predictions.score[x],
+                    'liked': raw_predictions.liked[x]
+                }
+                response['predictions'].append(item)
+            
+        return response
