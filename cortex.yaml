@@ -4,10 +4,12 @@
     type: python
     path: predictor.py
     config:
-      host: ml-bg-localdev-ro.zzesue.ng.0001.use2.cache.amazonaws.com
+      bucket: ml-models-cortex-localdev
+      key: model.pkl
+      host: ml-bg-redis-localdev-ro.zzesue.ng.0001.use2.cache.amazonaws.com
       port: 6379
-  monitoring:
-    model_type: classification
   compute:
     cpu: 1
     mem: 200M
+
+

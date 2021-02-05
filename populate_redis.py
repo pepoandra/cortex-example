@@ -8,7 +8,7 @@ _WEEK_IN_SECONDS = 60 * 60 * 24 * 7
 _REDIS_PIPE_SIZE = 1000
 _REDIS_LPUSH_BLOCK_SIZE = 1000
 try:
-    redis = StrictRedis(host='ml-bg-localdev.zzesue.ng.0001.use2.cache.amazonaws.com',
+    redis = StrictRedis(host='ml-bg-redis-localdev.zzesue.ng.0001.use2.cache.amazonaws.com',
                                      port=6379,
                                      encoding="utf-8",
                                      decode_responses=True)

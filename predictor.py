@@ -1,4 +1,7 @@
 import os
+import boto3
+from botocore import UNSIGNED
+from botocore.client import Config
 import pickle
 import sys
 import pandas as pd
@@ -6,12 +9,25 @@ from redis import StrictRedis
 
 
 
+
+
 class PythonPredictor:
     def __init__(self, config):
-        dirname = os.path.dirname(__file__)
-        filename = os.path.join(dirname, 'model.pkl')
-        self.model = pickle.load(open(filename, "rb"))
-
+        if('bucket' in config.keys()):
+            if os.environ.get("AWS_ACCESS_KEY_ID"):
+                s3 = boto3.client("s3")  # client will use your credentials if available
+            else:
+                s3 = boto3.client("s3", config=Config(signature_version=UNSIGNED))  # anonymous client
+            s3.download_file(config["bucket"], config["key"], "/tmp/model.pkl")
+            self.model = pickle.load(open("/tmp/model.pkl", "rb"))
+            self.source = 's3'
+        else:
+            dirname = os.path.dirname(__file__)
+            filename = os.path.join(dirname, 'model.pkl')
+            self.model = pickle.load(open(filename, "rb"))
+            self.source = 'file'
+            
+        self.config = str(config.keys())
         self.redis = StrictRedis(host=config['host'],
                                  port= config['port'],
                                  encoding="utf-8",
@@ -19,6 +35,9 @@ class PythonPredictor:
     
     def predict(self, payload):
         response = {
+                'env': 'cortex',
+                'source': self.source,
+                'config': self.config,
                 'usecase': self.model.to_model_info().usecase,
                 'model': self.model.to_model_info().model,
                 'version': self.model.to_model_info().version,
