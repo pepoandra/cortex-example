@@ -8,9 +8,6 @@ import pandas as pd
 from redis import StrictRedis
 
 
-
-
-
 class PythonPredictor:
     def __init__(self, config):
         if('bucket' in config.keys()):
@@ -27,7 +24,6 @@ class PythonPredictor:
             self.model = pickle.load(open(filename, "rb"))
             self.source = 'file'
             
-        self.config = str(config.keys())
         self.redis = StrictRedis(host=config['host'],
                                  port= config['port'],
                                  encoding="utf-8",
@@ -37,7 +33,6 @@ class PythonPredictor:
         response = {
                 'env': 'cortex',
                 'source': self.source,
-                'config': self.config,
                 'usecase': self.model.to_model_info().usecase,
                 'model': self.model.to_model_info().model,
                 'version': self.model.to_model_info().version,
